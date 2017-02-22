@@ -15,43 +15,54 @@
 \section{Design Considerations}
 \begin{itemize}
   \item The assembly language is designed to be very close to the actual machine instructions, with the assembler only  handling the layout of the instructions and the data in memory.
-  \item The language is formed to reduce the complexity of the assembler so it is not very flexible in terms of syntax.
+  \item The language is relatively flexible in terms of syntax and should be quite consistent with other languages.
 \end{itemize}
  
 
 \section{Labels}
 
-Labels go on their own line and label the next line that is an instruction.
+Labels must label an instruction. They are written with an identifier followed by a colon. The identifier can be include letters, numbers, '-' and '\_'. They can be on the same line or above the instruction.
 
-They are written with...
-\begin{enumerate}
- \item no spaces before,
- \item then an 'L',
- \item then an identifier (name) not containing spaces,
- \item then \textbf{optionally} a colon followed by an address number
- \item then a new line
-\end{enumerate}
+
+\noindent Example
+\begin{lstlisting}[frame=single]
+loop_start:
+  INSTRUCTION OPERAND
+  INSTRUCTION OPERAND
+loop-end : INSTRUCTION OPERAND
+\end{lstlisting}
+
+An address can be specified in square brackets as so...
+
+\begin{lstlisting}[frame=single]
+program_start[0x10]:
+  INSTRUCTION OPERAND
+next-bit [20] :  INSTRUCTION OPERAND
+\end{lstlisting}
+
 
 If an address is specified, the assembler will place that label and the following instructions at said location by padding with zeros from the normal location. The assembler does not do any clever reorganisation of code, so the address must be larger than they would be normally and they will push all subsequent code up as well.\\
 
-You can define more than one label on consecutive lines and they will be given the same value (unless the second has an address specified. Although that would produce weird behaviour and should not be done).
+You can define more than one label one after another and they will be given the same value (unless the second has an address specified. Although that would produce weird behaviour and should not be done).
 \\\\
 \noindent Good Example:
 \begin{lstlisting}[frame=single]
-Linit:0x10
-Lloop
+program_start:
+loop_start:
+  INSTRUCTION OPERAND
 \end{lstlisting}
 
 \section{Instructions}
 
 All instructions have 1 operand like the machine's actual instructions. In fact most of the instructions are exactly the instructions of the machine. Instructions are represented by...
 \begin{enumerate}
-\item at least one space at the start of the line (an indent),
 \item then the acronym (capital letters),
-\item then at least one more space,
+\item then at least one space,
 \item then the operand,
 \item then a new line (with no trailing spaces).
 \end{enumerate}
+
+\newpage
 
 \noindent Eg.
 \begin{lstlisting}[frame=single]
@@ -61,8 +72,6 @@ or
 \begin{lstlisting}[frame=single]
   OPR ADD
 \end{lstlisting}
-
-\newpage
 
 \noindent The instructions are as follows (taken from the machine code specification). The oreg value is provided by the operand.
 \break
@@ -126,8 +135,8 @@ The following instructions also accept labels as operands.
 
 \begin{verbatim}LDAM, LDBM, STAM, LDAC, LDBC, BR, BRZ, BRN, LDAP\end{verbatim}
 
-Instead of writing a static number you can signify a label by typing 'L' and then the identifier.
-\break
+Instead of writing a static number you can signify a label by typing the identifier.
+
 \begin{itemize}
 \item Use with LDAM, LDBM and STAM will load and store the data to/from the address of the label, be it a Data Section or 2 instructions.
 
@@ -136,37 +145,37 @@ Instead of writing a static number you can signify a label by typing 'L' and the
 \item For use with BR, BRZ, BRN and LDAP the assembler calculates the relative jump to the specified label and use that in the machine code.
 \end{itemize}
 \section{Comments}
-Any line that starts with '-' will be ignored so can be used for comments.
+Any line that starts with '\#' will be ignored so can be used for comments.
 \break Eg.
 \begin{lstlisting}[frame=single]
--this is a comment
+#this is a comment
 \end{lstlisting}
 
 \section{Example Program}
 \begin{lstlisting}[frame=single]
--This program maintains a stack while calling a function that returns 5
+#This program maintains a stack while calling a function that returns 5
  BR      L3
-Lsp
+sp:
  DATA    0x7CFE
-L3
+L3:
  LDAP    L5
  BR      L4
-L5
+L5:
  LDAI    1
  BR      -2
-L4
-L2
- LDBM    Lsp
+L4:
+L2:
+ LDBM    sp
  STAI    0
  LDAC    -1
  OPR     ADD
- STAM    Lsp
+ STAM    sp
  LDAC    5
- LDBM    Lsp
+ LDBM    sp
  STAI    2
  LDAC    1
  OPR     ADD
- STAM    Lsp
+ STAM    sp
  LDBI    1
  BRB     0
 \end{lstlisting}
@@ -175,8 +184,7 @@ L2
 
 \begin{itemize}
   \item The assembler doesn't like trailing white-space.
-  \item BR -1 probably won't do what you think since the negative value needs an extra instruction to produce it. (So should use -2)
-  \item Instructions must always have at least one space before them to differentiate them from labels.
+  \item BR -1 probably won't do what you think, since the negative value needs an extra instruction to produce it. (So should use -2)
   \item You can write new-lines and comments between lines of code, but not between a label and the line of code it is labelling.
   \item Due to needing prefixes for large values/addresses it is best to place data sections in the low parts of memory to reduce code size.
 \end{itemize}
