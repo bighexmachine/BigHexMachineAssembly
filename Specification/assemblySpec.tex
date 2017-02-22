@@ -1,0 +1,185 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{listings}
+\setlength\parindent{0pt}
+\author{Samuel Russell}
+\title{The BigHex Machine Assembly Specification}
+\begin{document}
+\maketitle
+
+
+\section{Design Considerations}
+\begin{itemize}
+  \item The assembly language is designed to be very close to the actual machine instructions, with the assembler only  handling the layout of the instructions and the data in memory.
+  \item The language is formed to reduce the complexity of the assembler so it is not very flexible in terms of syntax.
+\end{itemize}
+ 
+
+\section{Labels}
+
+Labels go on their own line and label the next line that is an instruction.
+
+They are written with...
+\begin{enumerate}
+ \item no spaces before,
+ \item then an 'L',
+ \item then an identifier (name) not containing spaces,
+ \item then \textbf{optionally} a colon followed by an address number
+ \item then a new line
+\end{enumerate}
+
+If an address is specified, the assembler will place that label and the following instructions at said location by padding with zeros from the normal location. The assembler does not do any clever reorganisation of code, so the address must be larger than they would be normally and they will push all subsequent code up as well.\\
+
+You can define more than one label on consecutive lines and they will be given the same value (unless the second has an address specified. Although that would produce weird behaviour and should not be done).
+\\\\
+\noindent Good Example:
+\begin{lstlisting}[frame=single]
+Linit:0x10
+Lloop
+\end{lstlisting}
+
+\section{Instructions}
+
+All instructions have 1 operand like the machine's actual instructions. In fact most of the instructions are exactly the instructions of the machine. Instructions are represented by...
+\begin{enumerate}
+\item at least one space at the start of the line (an indent),
+\item then the acronym (capital letters),
+\item then at least one more space,
+\item then the operand,
+\item then a new line (with no trailing spaces).
+\end{enumerate}
+
+\noindent Eg.
+\begin{lstlisting}[frame=single]
+  BR 1
+\end{lstlisting}
+or
+\begin{lstlisting}[frame=single]
+  OPR ADD
+\end{lstlisting}
+
+\newpage
+
+\noindent The instructions are as follows (taken from the machine code specification). The oreg value is provided by the operand.
+\break
+
+Access to constants and program addresses is provided by instructions which either
+load values directly or enable them to be loaded from a location in the program:
+\begin{verbatim}
+LDAM: areg <- mem[oreg] load from memory
+LDBM: breg <- mem[oreg] load from memory
+STAM: mem[oreg] <- areg store to memory
+
+LDAC: areg <- oreg load constant
+LDBC: breg <- oreg load constant
+LDAP: areg <- pc + oreg load address in program
+\end{verbatim}
+
+Access to data structures is provided by instructions which combine an address
+with an offset:
+\begin{verbatim}
+LDAI: areg <- mem[areg + oreg] load from memory
+LDBI: breg <- mem[breg + oreg] load from memory
+STAI: mem[breg + oreg] <- areg store to memory
+\end{verbatim}
+
+Branching, jumping and calling
+The branch instructions include conditional and unconditional relative branches.
+A branch using an offset in the stack is provided to support jump tables.
+\begin{verbatim}
+BR: pc <- pc + oreg branch relative unconditional
+BRZ: if areg = 0 then pc <- pc + oreg branch relative zero
+BRN: if areg < 0 then pc <- pc + oreg branch relative negative
+BRB: pc <- breg branch absolute
+\end{verbatim}
+
+Inter-register operandless instructions using OPR
+\begin{verbatim}
+OPR ADD: areg <- areg + breg add the registers values
+OPR SUB: areg <- areg - breg subtract the registers values
+\end{verbatim}
+
+\subsection*{Operands}
+Operands can be written as either:
+\begin{itemize}
+\item decimal format with negative value being prefixed by a '-' sign.
+\item unsigned hexadecimal format prefixed by '0x' to indicate this.
+\item the OPR command's sub instructions can be written by using the mnemonics ADD and SUB.
+\end{itemize}
+
+\subsection*{Data Sections}
+Slightly differently, to define a data word (16bits) to be stored to memory.
+we use 
+\begin{verbatim}
+DATA {initial value of the 16bit word}
+\end{verbatim}
+
+It is suggested you label this word with a label and refer to it using that since the assembler might move it (for example to align it to fit in 1 16 bit word) See example in code snippet below.
+
+\subsection*{Using labels as Operands for Instructions}
+
+The following instructions also accept labels as operands.
+
+\begin{verbatim}LDAM, LDBM, STAM, LDAC, LDBC, BR, BRZ, BRN, LDAP\end{verbatim}
+
+Instead of writing a static number you can signify a label by typing 'L' and then the identifier.
+\break
+\begin{itemize}
+\item Use with LDAM, LDBM and STAM will load and store the data to/from the address of the label, be it a Data Section or 2 instructions.
+
+\item Use with LDAC and LDBC will load the address of the label in to the register. This might be the base of an array which you could then use for memory access with indirection. 
+
+\item For use with BR, BRZ, BRN and LDAP the assembler calculates the relative jump to the specified label and use that in the machine code.
+\end{itemize}
+\section{Comments}
+Any line that starts with '-' will be ignored so can be used for comments.
+\break Eg.
+\begin{lstlisting}[frame=single]
+-this is a comment
+\end{lstlisting}
+
+\section{Example Program}
+\begin{lstlisting}[frame=single]
+-This program maintains a stack while calling a function that returns 5
+ BR      L3
+Lsp
+ DATA    0x7CFE
+L3
+ LDAP    L5
+ BR      L4
+L5
+ LDAI    1
+ BR      -2
+L4
+L2
+ LDBM    Lsp
+ STAI    0
+ LDAC    -1
+ OPR     ADD
+ STAM    Lsp
+ LDAC    5
+ LDBM    Lsp
+ STAI    2
+ LDAC    1
+ OPR     ADD
+ STAM    Lsp
+ LDBI    1
+ BRB     0
+\end{lstlisting}
+
+\section{Notes}
+
+\begin{itemize}
+  \item The assembler doesn't like trailing white-space.
+  \item BR -1 probably won't do what you think since the negative value needs an extra instruction to produce it. (So should use -2)
+  \item Instructions must always have at least one space before them to differentiate them from labels.
+  \item You can write new-lines and comments between lines of code, but not between a label and the line of code it is labelling.
+  \item Due to needing prefixes for large values/addresses it is best to place data sections in the low parts of memory to reduce code size.
+\end{itemize}
+
+
+\end{document}
