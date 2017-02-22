@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9) (preloaded format=pdflatex 2016.6.28)  9 NOV 2016 00:59
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9) (preloaded format=pdflatex 2016.6.28)  22 FEB 2017 01:22
 entering extended mode
 **./AssemblyExamples.tex
 (AssemblyExamples.tex
@@ -554,11 +554,11 @@ Underfull \hbox (badness 10000) in paragraph at lines 102--104
 Here is how much of TeX's memory you used:
  3547 strings out of 493335
  43960 string characters out of 3136677
- 131921 words of memory out of 3000000
+ 130921 words of memory out of 3000000
  7066 multiletter control sequences out of 15000+200000
  10888 words of font info for 43 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 27i,6n,32p,353b,1056s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 27i,6n,32p,353b,1054s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/
 public/amsfonts/cm/cmbx12.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/pu
 blic/amsfonts/cm/cmmi10.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/publ
@@ -566,7 +566,7 @@ ic/amsfonts/cm/cmr10.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/
 amsfonts/cm/cmr12.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/ams
 fonts/cm/cmr17.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfon
 ts/cm/cmsy10.pfb>
-Output written on AssemblyExamples.pdf (4 pages, 83050 bytes).
+Output written on AssemblyExamples.pdf (4 pages, 82964 bytes).
 PDF statistics:
  39 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

@@ -15,14 +15,14 @@
 This document is available online at\\ \href{http://github.com/bighexmachine/BigHexMachineAssembly/raw/master/Worksheet/bigHexMachineWorksheet.pdf}{github.com/bighexmachine/BigHexMachineAssembly/raw/master/Worksheet/bigHexMachineWorksheet.pdf}\\or \href{http://tinyurl.com/bighexworksheet}{tinyurl.com/bighexworksheet}
 
 \section{Introduction to the Big Hex Machine}
-The Big Hex Machine is a two register machine with 32 kilobytes of RAM memory. However, it only supports 2 arithmetic operations: add and subtract. The other instructions move data to and from and registers, RAM and IO ports. However it is a bit big to have one each to play with. However, we have also build a on-line simulator so you can try out writing programs for it!
+The Big Hex Machine is a two register machine with 32 kilobytes of RAM memory. However, it only supports 2 arithmetic operations: add and subtract. The other instructions move data to and from registers, RAM and IO ports. It is a bit big to have one each to play with but we have also build a on-line simulator so you can all try out writing programs for it!
 
 \section{Information about the Instruction Set}
-The the machine has 16 instructions, that each take one operand (a parameter), although they might also use the data stored in the registers. One of the instructions is split in to 4 different instructions (each without an operand) by giving one of 4 input operands. Don't worry you won't need all of them and we'll take you through the ones you do but if your interested \href{https://bighexmachine.github.io/BigHexOnlineSimulator/assemblySpec.pdf}{here} is the specification.\\
+The the machine has 16 instructions, that each take one operand (a parameter), although they might also use the data stored in the registers. One of the instructions is split in to 4 different instructions (each without an operand) by giving one of 4 input operands. Don't worry, you won't need all of them and we'll take you through the ones you do, but if your interested \href{https://bighexmachine.github.io/BigHexOnlineSimulator/assemblySpec.pdf}{here} is the specification.\\
 
-For the following exercises X is a number written in decimal like 182 (2 units, 8 tens, 1 hundred) or in hexadecimal like 0x298 (8 units, 9 sixteens, 2 sixteen-squareds).\\
+For the following exercises, X is a number either written in decimal like 182 (2 units, 8 tens, 1 hundred) or in hexadecimal like 0x298 (8 units, 9 sixteens, 2 sixteen-squareds).\\
 
-We write an instruction with a it's short name in captitals and then a space and then the operand/input value. For example to branch (move) one step forward in the program.
+We write an instruction with a it's short name (mnemonic) in capitals and then a space and then the operand/input value. For example to branch (move) one step forward in the program.
 \begin{lstlisting}[frame=single]
 BR 1
 \end{lstlisting}
@@ -32,8 +32,8 @@ Open up a web browser, and visit \href{http://tinyurl.com/bighexmachine}{tinyurl
 \begin{itemize}
 \item A view of the memory. Each word (addressable slot) in memory is represented by  4 hexadecimal digits.
 \item A view of the register values. The RA (register A) and RB (register B) are the important ones, but RP (program counter) also keeps track of where in the program you are.
-\item A program control panel. This is where you can start and stop your program. It might be useful to step through one instruction at a time to see what is going on. But do remember to reset each time to restart the program other wise the computer will try and go from where yo left of last time.
-\item A disassembler which translates the computer's binary in memory back to human readable format. You will see every row says LDAM just because that happens to be the instruction represented by 00. 
+\item A program control panel. This is where you can start and stop your program. It might be useful to step through one instruction at a time to see what is going on. But do remember to press reset each time you want to restart the program, other wise the computer will try and start up from where you left of last time.
+\item A disassembler which translates the computer's binary in memory, back to human readable format. You will see every row says LDAM just because that happens to be the instruction represented by 00. 
 \end{itemize}
 
 Click on 'edit', in the memory section.
@@ -53,7 +53,7 @@ Try writing something like the following, in the text box.
 LDAC 10
 LDBC 0xA
 \end{lstlisting}
-Then click 'assemble' to translate the text in to machine code and then accept to go back to the previous page to run and test your code. To do this click 'reset' then 'step' twice to execute each instruction. Notice the instructions in the disassembler and the values change in the register viewer. Try changing the above code the load different values in to the registers.
+Then click 'assemble' to translate the text in to machine code and then 'accept' to go back to the previous page to run and test your code. To do this click 'reset' then 'step' twice to execute each instruction. Notice the instructions in the disassembler and the values change in the register viewer. Try changing the above code the load different values in to the registers.
 
 \section{Exercise 2: Adding Two Constants}
 
@@ -78,7 +78,7 @@ These are some instructions to get values from memory.
 
 \begin{verbatim}
 LDAM X	: Gets the value at memory address X and puts it in register A
-LDBM X 	: Gets the value at memory address X and puts it in register B
+LDBM X	: Gets the value at memory address X and puts it in register B
 STAM X	: Stores the value in register A in to memory at address X
 \end{verbatim}
 
@@ -99,7 +99,7 @@ val_out: DATA   0
 
 This is where the real power of the computer comes; repeating stuff over and over, and making decisions!
 
-This computer supports the unconditional branch (BR and BRB) which jumps in the program every time, and also conditional jumps (BRZ and BRN) which look at the value of the registers to decide to jump or not.
+This computer supports the unconditional branches (BR and BRB) which jumps in the program every time, and also conditional jumps (BRZ and BRN) which look at the value of the registers to decide to jump or not.
 \begin{verbatim}
 BR X	: Jumps X+1 places forward in the program. (remember it normally jumps 1 ahead anyway).
 BRZ X 	: if A reg = 0 then it jumps as above but else jump goes to the next instruction like normal.
@@ -109,7 +109,7 @@ BRB X	: unconditionally jumps to position X.
 
 Just like we can label data we can also label parts of the program. This makes jumping to the right place easier.
 
-Here's an example to try.
+Here's an example to try. Notice to never ending loop a the end.
 \begin{lstlisting}[frame=single]
 LDAC 10
 start:
@@ -122,7 +122,7 @@ BR end
 \end{lstlisting}
 
 \section{Exercise 4: More Loops and conditions}
-You may have to many variables to fit in to registers. If this is the case you have to store them in memory. This is called spilling and is normally done all automatically.
+You may have to many variables to fit in to registers. If this is the case you have to store them in memory. This is called spilling and is normally done all automatically, but here is an example of it done in code.
 
 \begin{lstlisting}[frame=single]
 start:
@@ -133,18 +133,18 @@ STAM counter
 BRZ end
 BR start
 end:
-LDAM Lsum
+BR end
 counter:
 DATA 10
 \end{lstlisting}
 
 \section{Challenge 1: Summing}
-Using the code previously your challenge is to write a program to calculate the of sum the integers (whole numbers) from 1 to N. You can input the N using the LDAC/LDBC instructions.
+Using the previous code examples, your challenge is to write a program to calculate the of sum the integers (whole numbers) from 1 to N. You can input the N using the LDAC/LDBC instructions.
 
 \section{Challenge 2: Multiplication}
 This machine has a very \href{https://en.wikipedia.org/wiki/Reduced_instruction_set_computing}{RISC} architecture which means instructions can be decoded simply and the control
 logic is relatively small. This does mean however that there is no multiplication instruction and so it has to be
-done iteratively (this was true up until surprisingly recently).
+done iteratively (in a loop, one step at a time). This was actually true in all most computers up until surprisingly recently.
 
 Now can you create a program to multiple two numbers again setting the inputs with LDAC and/or LDBC.
 
@@ -156,5 +156,7 @@ This is a classic mathematical problem. Remember n! = (n) * (n - 1)...(2) * (1).
 
 We can then use this multiplication code we have written as a sub procedure (function) to write a program that calculates the factorial of a
 given number.
+
+Hint: Use labels to name each part of the program, don't worry if it is in lots of sections. This actually makes a good program.
 
 \end{document}
